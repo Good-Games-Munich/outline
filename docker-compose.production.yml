@@ -1,0 +1,48 @@
+# This file extends the docker-compose.yml with production configurations/overrides. https://docs.docker.com/compose/compose-file/13-merge/
+version: "3.8"
+services:
+  postgres:
+    # Add a name to easy identify
+    container_name: outlinePostgresProd
+
+  redis:
+    # Add a name to easy identify
+    container_name: outlineRedisProd
+
+  minio:
+    # Add a name to easy identify
+    container_name: outlineMinioProd
+
+    environment:
+      # Reverse proxy config. See: https://github.com/beuluis/nginx
+      VIRTUAL_HOST: ${MINIO_HOST?Missing environment variable see readme}
+      VIRTUAL_PORT: 9000 # Port of service to procy inside container
+      LETSENCRYPT_HOST: ${MINIO_HOST:?Missing environment variable see readme}
+
+    networks:
+      - default
+      - nginxproxynet
+
+  outline:
+    # Add a name to easy identify
+    container_name: outlineProd
+
+    # https://docs.getoutline.com/s/hosting/doc/docker-7pfeLP5a8t
+    # Configurations: https://github.com/outline/outline/blob/main/.env.sample
+    environment:
+      # URL should point to the fully qualified, publicly accessible URL
+      URL: https://${OUTLINE_HOST?Missing environment variable see readme}
+      AWS_S3_UPLOAD_BUCKET_URL: https://${MINIO_HOST}
+      # Reverse proxy config. See: https://github.com/beuluis/nginx
+      VIRTUAL_HOST: ${OUTLINE_HOST?Missing environment variable see readme}
+      VIRTUAL_PORT: 3000 # Port of service to procy inside container
+      LETSENCRYPT_HOST: ${OUTLINE_HOST:?Missing environment variable see readme}
+
+    networks:
+      - default
+      - nginxproxynet
+
+networks:
+  nginxproxynet:
+    name: ${PROXY_NETWORK_NAME-nginxproxynet}
+    external: true

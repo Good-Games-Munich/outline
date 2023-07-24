@@ -1,0 +1,47 @@
+# This file extends the docker-compose.yml with develop configurations/overrides. https://docs.docker.com/compose/compose-file/13-merge/
+# This file gets applied automatically when no --file parameter is provided
+version: "3.8"
+services:
+  postgres:
+    # Add a name to easy identify
+    container_name: outlinePostgresDev
+
+    environment:
+      # Try to force color in the terminal because pretty!
+      FORCE_COLOR: 1
+
+  redis:
+    # Add a name to easy identify
+    container_name: outlineRedisDev
+
+    environment:
+      # Try to force color in the terminal because pretty!
+      FORCE_COLOR: 1
+
+  minio:
+    # Add a name to easy identify
+    container_name: outlineMinioDev
+
+    environment:
+      # Try to force color in the terminal because pretty!
+      FORCE_COLOR: 1
+
+    # Map container port to host port. https://docs.docker.com/compose/networking/
+    ports:
+      - 9000:9000
+
+  outline:
+    # Add a name to easy identify
+    container_name: outlineDev
+
+    environment:
+      # Try to force color in the terminal because pretty!
+      FORCE_COLOR: 1
+      # URL should point to the fully qualified, publicly accessible URL. Use mapped ports here
+      URL: http://localhost:3400
+      # Minio URL. Use 127.0.0.1 here instead of localhost because it seams to not accept this. Also this need to be accesible from the host.
+      AWS_S3_UPLOAD_BUCKET_URL: http://127.0.0.1:9000/
+
+    # Map container port to host port. https://docs.docker.com/compose/networking/
+    ports:
+      - 3400:3000

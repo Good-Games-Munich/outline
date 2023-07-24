@@ -1,0 +1,173 @@
+# This file serves as the base to build on top on.
+version: "3.8"
+services:
+  # https://hub.docker.com/_/postgres
+  postgres:
+    # https://hub.docker.com/_/postgres/tags
+    image: postgres:15.3-alpine
+
+    # https://www.baeldung.com/ops/docker-compose-restart-policies
+    restart: always
+
+    # Default postgres port. This line is not here to configure something. it is more of a configuration so chaning it will do nothing
+    ports:
+      - 5432
+
+    # https://docs.docker.com/compose/environment-variables/set-environment-variables/
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD?Missing environment variable see readme}
+      POSTGRES_USER: outline
+      POSTGRES_DB: outline
+      PGDATA: /var/lib/postgresql/data/pgdata
+
+    # https://docs.docker.com/storage/volumes/
+    # Define a named volume to persist data
+    volumes:
+      - outlinePostgressData:/var/lib/postgresql/data/pgdata
+
+  # https://hub.docker.com/_/redis
+  redis:
+    # https://hub.docker.com/_/redis/tags
+    image: redis:7.0-alpine
+
+    # https://www.baeldung.com/ops/docker-compose-restart-policies
+    restart: always
+
+    # Default redis port. This line is not here to configure something. it is more of a configuration so chaning it will do nothing
+    ports:
+      - 6379
+
+  # https://hub.docker.com/r/minio/minio
+  minio:
+    # https://hub.docker.com/r/minio/minio/tags
+    image: minio/minio:RELEASE.2023-07-21T21-12-44Z
+
+    # https://www.baeldung.com/ops/docker-compose-restart-policies
+    restart: always
+
+    ports:
+      # Default minio port. This line is not here to configure something. it is more of a configuration so chaning it will do nothing
+      - 9000
+
+    # Override standward command to start up server
+    command: server /data
+
+    environment:
+      MINIO_ROOT_USER: outline
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD?Missing environment variable see readme}
+
+    # https://docs.docker.com/storage/volumes/
+    # Define a named volume to persist data
+    volumes:
+      - outlineMinioData:/data
+
+  # https://hub.docker.com/r/minio/mc
+  minio-setup:
+    # https://hub.docker.com/r/minio/mc/tags
+    image: minio/mc:RELEASE.2023-07-21T20-44-27Z
+
+    # https://docs.docker.com/compose/compose-file/05-services/#depends_on
+    depends_on:
+      - minio
+
+    # Outline does not create its bucket automatically. So we do it for it via the cli
+    # First add a host config with the 'minio' alias followed by url username and password
+    # Create the 'bucket outline-bucket'
+    entrypoint: /bin/sh -c "
+      /usr/bin/mc config host add minio http://minio:9000 outline ${MINIO_ROOT_PASSWORD};
+      /usr/bin/mc mb minio/outline-bucket;
+      /usr/bin/mc anonymous set download minio/outline-bucket;
+      exit 0;"
+
+  # https://hub.docker.com/r/outlinewiki/outline
+  outline:
+    # https://hub.docker.com/r/outlinewiki/outline/tags
+    image: outlinewiki/outline:0.70.2
+
+    # https://www.baeldung.com/ops/docker-compose-restart-policies
+    restart: always
+
+    # Default outline port. This line is not here to configure something. it is more of a configuration so chaning it will do nothing
+    ports:
+      - 3000
+
+    # https://docs.getoutline.com/s/hosting/doc/docker-7pfeLP5a8t
+    # Configurations: https://github.com/outline/outline/blob/main/.env.sample
+    # All configs should be set here as environment variable
+    environment:
+      # hex-encoded 32-byte random key. Run 'openssl rand -hex 32' to get one
+      SECRET_KEY: ${SECRET_KEY?Missing environment variable see readme}
+      # hex-encoded 32-byte random key. Run 'openssl rand -hex 32' to get one
+      UTILS_SECRET: ${UTILS_SECRET?Missing environment variable see readme}
+      # DB URL with protocol://username:password@host:port/db_name. Host makes use of https://docs.docker.com/compose/networking/
+      DATABASE_URL: postgres://outline:${POSTGRES_PASSWORD}@postgres:5432/outline
+      # The db does not use ssl so we disable it
+      PGSSLMODE: disable
+      # Redis url with protocol://host:port. Host makes use of https://docs.docker.com/compose/networking/
+      REDIS_URL: redis://redis:6379
+      # Disable force https since our reverse proxy will handle it
+      FORCE_HTTPS: 0
+      # Set the log level to get a bit more info
+      LOG_LEVEL: info
+      # Set default ui language. See https://translate.getoutline.com for a list
+      DEFAULT_LANGUAGE: de_DE
+      # Enable the rate limiter
+      RATE_LIMITER_ENABLED: 1
+      # Set the limiter to 1000 requests in a 60 duration window
+      RATE_LIMITER_REQUESTS: 1000
+      RATE_LIMITER_DURATION_WINDOW: 60
+
+      # Minio root user name
+      AWS_ACCESS_KEY_ID: outline
+      # Minio password
+      AWS_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD}
+      # Some region. Does not matter really
+      AWS_REGION: local
+      # TODO: add gitignore
+      # Minio bucket name
+      AWS_S3_UPLOAD_BUCKET_NAME: outline-bucket
+      # Set this to private for file creation
+      AWS_S3_ACL: private
+
+      # OIDC config for discord. Follow https://fusionauth.io/docs/v1/tech/identity-providers/openid-connect/discord for a rough tutorial
+      # The redirect url is: (http|https)://{url}/auth/oidc.callback
+      # Client id from: https://discord.com/developers/applications/ > Click your application > OAuth2 > 'APPLICATION ID'
+      OIDC_CLIENT_ID: ${DISCORD_APP_ID?Missing environment variable see readme}
+      # Client secret from: https://discord.com/developers/applications/ > Click your application > OAuth2 > 'CLIENT SECRET'
+      OIDC_CLIENT_SECRET: ${DISCORD_APP_SECRET?Missing environment variable see readme}
+      OIDC_AUTH_URI: https://discord.com/api/oauth2/authorize
+      OIDC_TOKEN_URI: https://discord.com/api/oauth2/token
+      OIDC_USERINFO_URI: https://discord.com/api/users/@me
+      # JSON path from where to get the username. See https://discord.com/developers/docs/resources/user
+      OIDC_USERNAME_CLAIM: username
+      # Display name to show in UI
+      OIDC_DISPLAY_NAME: Discord
+      # Scopes to request from discord
+      OIDC_SCOPES: identify email
+
+      # https://docs.getoutline.com/s/hosting/doc/smtp-cqCJyZGMIB
+      SMTP_HOST: ${SMTP_HOST?Missing environment variable see readme}
+      SMTP_PORT: ${SMTP_PORT?Missing environment variable see readme}
+      SMTP_USERNAME: ${SMTP_USERNAME?Missing environment variable see readme}
+      SMTP_PASSWORD: ${SMTP_PASSWORD?Missing environment variable see readme}
+      SMTP_FROM_EMAIL: ${SMTP_FROM_EMAIL?Missing environment variable see readme}
+      SMTP_REPLY_EMAIL: ${SMTP_REPLY_EMAIL-}
+      SMTP_TLS_CIPHERS: ${SMTP_TLS_CIPHERS-}
+      SMTP_SECURE: ${SMTP_TLS_CIPHERS-1}
+
+    # https://docs.docker.com/storage/volumes/
+    # Define a named volume to persist data
+    volumes:
+      - outlineData:/data
+
+    # https://docs.docker.com/compose/compose-file/05-services/#depends_on
+    depends_on:
+      - postgres
+      - redis
+      - minio
+
+# https://docs.docker.com/storage/volumes/
+volumes:
+  outlineData:
+  outlinePostgressData:
+  outlineMinioData:
