@@ -34,6 +34,7 @@ Will be documented when github action is documented.
 
 1. Follow the [Customization](#customization) section and set all variables with `Required in dev` `true`.
 2. Run `docker-compose up --build`
+3. Navigate to `http://localhost:3400`
 
 ### Customization
 
