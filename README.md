@@ -84,11 +84,11 @@ Contributions are what make the open source community such an amazing place to l
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
 
-[contributors-shield]: https://img.shields.io/github/contributors/:Good-Games-Munich/outline.svg?style=flat-square
-[contributors-url]: https://github.com/:Good-Games-Munich/outline/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/:Good-Games-Munich/outline.svg?style=flat-square
-[forks-url]: https://github.com/:Good-Games-Munich/outline/network/members
-[stars-shield]: https://img.shields.io/github/stars/:Good-Games-Munich/outline.svg?style=flat-square
-[stars-url]: https://github.com/:Good-Games-Munich/outline/stargazers
-[issues-shield]: https://img.shields.io/github/issues/:Good-Games-Munich/outline.svg?style=flat-square
-[issues-url]: https://github.com/:Good-Games-Munich/outline/issues
+[contributors-shield]: https://img.shields.io/github/contributors/Good-Games-Munich/outline.svg?style=flat-square
+[contributors-url]: https://github.com/Good-Games-Munich/outline/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/Good-Games-Munich/outline.svg?style=flat-square
+[forks-url]: https://github.com/Good-Games-Munich/outline/network/members
+[stars-shield]: https://img.shields.io/github/stars/Good-Games-Munich/outline.svg?style=flat-square
+[stars-url]: https://github.com/Good-Games-Munich/outline/stargazers
+[issues-shield]: https://img.shields.io/github/issues/Good-Games-Munich/outline.svg?style=flat-square
+[issues-url]: https://github.com/Good-Games-Munich/outline/issues
