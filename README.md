@@ -28,17 +28,17 @@ Uses discord OpenID Connect for authentication for ease of use.
 
 ### Production
 
-Will be documented when github action is documented.
+Follow [Creating a release](https://github.com/Good-Games-Munich/.github/wiki/workflows#creating-a-release).
 
 ### Development
 
-1. Follow the [Customization](#customization) section and set all variables with `Required in dev` `true`.
-2. Run `docker-compose up --build`
+1. Follow [local setup](https://github.com/Good-Games-Munich/.github/wiki/workflows#local-setup).
+2. Follow the [Customization](#customization) section and set all variables with `Required in dev` `true`.
 3. Navigate to `http://localhost:3400`
 
 ### Customization
 
-Create a environment file `touch .env.local`. Override variables in the `{variable name}={variable value}` format. All required variables need to be overridden for the respected environment.
+Create a environment file `touch .env`. Override variables in the `{variable name}={variable value}` format. All required variables need to be overridden for the respected environment.
 
 | Variable              | Description                                                                                                                                                                                                                                                                     | Required in dev | Required in prod | Default value |
 | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------- | ---------------- | ------------- |
@@ -74,13 +74,7 @@ Follow [Discord OpenId Connect](https://fusionauth.io/docs/v1/tech/identity-prov
 
 ## Contributing
 
-Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
-
-1. Fork the Project
-2. Create your Feature Branch (`git switch -c feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+Follow [contributing](https://github.com/Good-Games-Munich/.github/wiki/workflows#contributing).
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
