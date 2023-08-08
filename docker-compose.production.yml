@@ -47,5 +47,5 @@ services:
 # Reverse proxy network. See: https://github.com/Good-Games-Munich/nginx
 networks:
   nginxproxynet:
-    name: ${PROXY_NETWORK_NAME-nginxproxynet}
+    name: nginxproxynet
     external: true
