@@ -82,7 +82,7 @@ services:
   # https://hub.docker.com/r/outlinewiki/outline
   outline:
     # https://hub.docker.com/r/outlinewiki/outline/tags
-    image: outlinewiki/outline:0.70.2
+    image: outlinewiki/outline:0.75.2
 
     # https://www.baeldung.com/ops/docker-compose-restart-policies
     restart: always
