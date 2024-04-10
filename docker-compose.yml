@@ -9,7 +9,7 @@ services:
     # https://www.baeldung.com/ops/docker-compose-restart-policies
     restart: always
 
-    # Default postgres port. This line is not here to configure something. it is more of a configuration so chaning it will do nothing
+    # Default postgres port. This line is not here to configure something. It is more of a reminder so chaning it will do nothing
     ports:
       - 5432
 
@@ -33,61 +33,19 @@ services:
     # https://www.baeldung.com/ops/docker-compose-restart-policies
     restart: always
 
-    # Default redis port. This line is not here to configure something. it is more of a configuration so chaning it will do nothing
+    # Default redis port. This line is not here to configure something. It is more of a reminder so chaning it will do nothing
     ports:
       - 6379
-
-  # https://hub.docker.com/r/minio/minio
-  minio:
-    # https://hub.docker.com/r/minio/minio/tags
-    image: minio/minio:RELEASE.2023-07-21T21-12-44Z
-
-    # https://www.baeldung.com/ops/docker-compose-restart-policies
-    restart: always
-
-    ports:
-      # Default minio port. This line is not here to configure something. it is more of a configuration so chaning it will do nothing
-      - 9000
-
-    # Override standward command to start up server
-    command: server /data
-
-    environment:
-      MINIO_ROOT_USER: outline
-      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD?Missing environment variable see readme}
-
-    # https://docs.docker.com/storage/volumes/
-    # Define a named volume to persist data
-    volumes:
-      - outlineMinioData:/data
-
-  # https://hub.docker.com/r/minio/mc
-  minio-setup:
-    # https://hub.docker.com/r/minio/mc/tags
-    image: minio/mc:RELEASE.2023-07-21T20-44-27Z
-
-    # https://docs.docker.com/compose/compose-file/05-services/#depends_on
-    depends_on:
-      - minio
-
-    # Outline does not create its bucket automatically. So we do it for it via the cli
-    # First add a host config with the 'minio' alias followed by url username and password
-    # Create the 'bucket outline-bucket'
-    entrypoint: /bin/sh -c "
-      /usr/bin/mc config host add minio http://minio:9000 outline ${MINIO_ROOT_PASSWORD};
-      /usr/bin/mc mb minio/outline-bucket;
-      /usr/bin/mc anonymous set download minio/outline-bucket;
-      exit 0;"
 
   # https://hub.docker.com/r/outlinewiki/outline
   outline:
     # https://hub.docker.com/r/outlinewiki/outline/tags
-    image: outlinewiki/outline:0.70.2
+    image: outlinewiki/outline:0.75.2
 
     # https://www.baeldung.com/ops/docker-compose-restart-policies
     restart: always
 
-    # Default outline port. This line is not here to configure something. it is more of a configuration so chaning it will do nothing
+    # Default outline port. This line is not here to configure something. It is more of a reminder so chaning it will do nothing
     ports:
       - 3000
 
@@ -116,18 +74,8 @@ services:
       # Set the limiter to 1000 requests in a 60 duration window
       RATE_LIMITER_REQUESTS: 1000
       RATE_LIMITER_DURATION_WINDOW: 60
-
-      # Minio root user name
-      AWS_ACCESS_KEY_ID: outline
-      # Minio password
-      AWS_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD}
-      # Some region. Does not matter really
-      AWS_REGION: local
-      # TODO: add gitignore
-      # Minio bucket name
-      AWS_S3_UPLOAD_BUCKET_NAME: outline-bucket
-      # Set this to private for file creation
-      AWS_S3_ACL: private
+      FILE_STORAGE: local
+      FILE_STORAGE_UPLOAD_MAX_SIZE: 26214400
 
       # OIDC config for discord. Follow https://fusionauth.io/docs/v1/tech/identity-providers/openid-connect/discord for a rough tutorial
       # The redirect url is: (http|https)://{url}/auth/oidc.callback
@@ -158,16 +106,14 @@ services:
     # https://docs.docker.com/storage/volumes/
     # Define a named volume to persist data
     volumes:
-      - outlineData:/data
+      - outlineData:/var/lib/outline/data
 
     # https://docs.docker.com/compose/compose-file/05-services/#depends_on
     depends_on:
       - postgres
       - redis
-      - minio
 
 # https://docs.docker.com/storage/volumes/
 volumes:
   outlineData:
   outlinePostgressData:
-  outlineMinioData:
