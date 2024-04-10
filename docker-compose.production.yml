@@ -9,21 +9,6 @@ services:
     # Add a name to easy identify
     container_name: outlineRedisProd
 
-  minio:
-    # Add a name to easy identify
-    container_name: outlineMinioProd
-
-    environment:
-      # Reverse proxy config. See: https://github.com/Good-Games-Munich/nginx
-      VIRTUAL_HOST: ${MINIO_HOST?Missing environment variable see readme}
-      VIRTUAL_PORT: 9000 # Port of service to procy inside container
-      LETSENCRYPT_HOST: ${MINIO_HOST:?Missing environment variable see readme}
-
-    # Reverse proxy network. See: https://github.com/Good-Games-Munich/nginx
-    networks:
-      - default
-      - nginxproxynet
-
   outline:
     # Add a name to easy identify
     container_name: outlineProd
@@ -33,7 +18,6 @@ services:
     environment:
       # URL should point to the fully qualified, publicly accessible URL
       URL: https://${OUTLINE_HOST?Missing environment variable see readme}
-      AWS_S3_UPLOAD_BUCKET_URL: https://${MINIO_HOST}
       # Reverse proxy config. See: https://github.com/Good-Games-Munich/nginx
       VIRTUAL_HOST: ${OUTLINE_HOST?Missing environment variable see readme}
       VIRTUAL_PORT: 3000 # Port of service to procy inside container
