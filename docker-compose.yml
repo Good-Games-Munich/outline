@@ -40,7 +40,7 @@ services:
   # https://hub.docker.com/r/outlinewiki/outline
   outline:
     # https://hub.docker.com/r/outlinewiki/outline/tags
-    image: outlinewiki/outline:0.81.0
+    image: outlinewiki/outline:0.81.1
 
     # https://www.baeldung.com/ops/docker-compose-restart-policies
     restart: always
