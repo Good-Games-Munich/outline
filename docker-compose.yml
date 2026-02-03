@@ -28,7 +28,7 @@ services:
   # https://hub.docker.com/_/redis
   redis:
     # https://hub.docker.com/_/redis/tags
-    image: redis:7.0-alpine
+    image: redis:7.4-alpine
 
     # https://www.baeldung.com/ops/docker-compose-restart-policies
     restart: always
