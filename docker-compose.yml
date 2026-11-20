@@ -9,9 +9,9 @@ services:
     # https://www.baeldung.com/ops/docker-compose-restart-policies
     restart: always
 
-    # Default postgres port. This line is not here to configure something. It is more of a reminder so chaning it will do nothing
-    ports:
-      - 5432
+    # Default postgres port. Only reachable by other containers on the compose network. Do not use `ports` here: it would publish the port on a random host port.
+    expose:
+      - "5432"
 
     # https://docs.docker.com/compose/environment-variables/set-environment-variables/
     environment:
@@ -33,9 +33,9 @@ services:
     # https://www.baeldung.com/ops/docker-compose-restart-policies
     restart: always
 
-    # Default redis port. This line is not here to configure something. It is more of a reminder so chaning it will do nothing
-    ports:
-      - 6379
+    # Default redis port. Only reachable by other containers on the compose network. Do not use `ports` here: it would publish the port on a random host port.
+    expose:
+      - "6379"
 
   # https://hub.docker.com/r/outlinewiki/outline
   outline:
@@ -45,9 +45,9 @@ services:
     # https://www.baeldung.com/ops/docker-compose-restart-policies
     restart: always
 
-    # Default outline port. This line is not here to configure something. It is more of a reminder so chaning it will do nothing
-    ports:
-      - 3000
+    # Default outline port. Only reachable by other containers on the compose network. Do not use `ports` here: it would publish the port on a random host port.
+    expose:
+      - "3000"
 
     # https://docs.getoutline.com/s/hosting/doc/docker-7pfeLP5a8t
     # Configurations: https://github.com/outline/outline/blob/main/.env.sample
